@@ -4,14 +4,20 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\MainController;
 use App\Http\Controllers\TripController;
 
-// Головна сторінка
-Route::get('/', [MainController::class, 'index']);
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+*/
+
+// Головна сторінка (використовує welcome.blade.php через MainController)
+Route::get('/', [MainController::class, 'index'])->name('home');
 
 // Сторінка "Про проєкт"
-Route::get('/about', [MainController::class, 'about']);
+Route::get('/about', [MainController::class, 'about'])->name('about');
 
-// Список усіх рейсів (каталог)
-Route::get('/trips', [TripController::class, 'index']);
+// Список усіх рейсів (Каталог)
+Route::get('/trips', [TripController::class, 'index'])->name('trips.index');
 
-// Сторінка конкретного рейсу за ID
-Route::get('/trips/{id}', [TripController::class, 'show']);
+// Детальна сторінка конкретного рейсу
+Route::get('/trips/{id}', [TripController::class, 'show'])->name('trips.show');
