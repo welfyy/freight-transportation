@@ -3,21 +3,32 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\MainController;
 use App\Http\Controllers\TripController;
+// Імпортуємо адмінський контролер з аліасом, щоб не було конфлікту імен
+use App\Http\Controllers\Admin\TripController as AdminTripController;
 
 /*
 |--------------------------------------------------------------------------
-| Web Routes
+| ПУБЛІЧНІ МАРШРУТИ (Для клієнтів)
 |--------------------------------------------------------------------------
 */
 
-// Головна сторінка (використовує welcome.blade.php через MainController)
 Route::get('/', [MainController::class, 'index'])->name('home');
-
-// Сторінка "Про проєкт"
 Route::get('/about', [MainController::class, 'about'])->name('about');
 
-// Список усіх рейсів (Каталог)
-Route::get('/trips', [TripController::class, 'index'])->name('trips.index');
+// Публічний каталог рейсів
+Route::prefix('trips')->name('trips.')->group(function () {
+    Route::get('/', [TripController::class, 'index'])->name('index');
+    Route::get('/{trip}', [TripController::class, 'show'])->name('show'); 
+});
 
-// Детальна сторінка конкретного рейсу
-Route::get('/trips/{id}', [TripController::class, 'show'])->name('trips.show');
+/*
+|--------------------------------------------------------------------------
+| АДМІНІСТРАТИВНІ МАРШРУТИ (CRUD: перегляд, створення, редагування, видалення)
+|--------------------------------------------------------------------------
+*/
+
+Route::prefix('admin')->name('admin.')->group(function () {
+    // Використання resource гарантує створення маршрутів:
+    // admin.trips.index, admin.trips.edit, admin.trips.update тощо.
+    Route::resource('trips', AdminTripController::class);
+});

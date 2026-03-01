@@ -10,7 +10,8 @@
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
     </style>
 </head>
-<body class="flex flex-col min-h-screen"> <nav class="bg-white border-b border-gray-100 sticky top-0 z-50">
+<body class="flex flex-col min-h-screen"> 
+    <nav class="bg-white border-b border-gray-100 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
             <a href="/" class="flex items-center gap-2">
                 <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
@@ -18,10 +19,16 @@
                 </div>
                 <span class="text-xl font-black text-slate-900 tracking-tighter">MyFleetDB</span>
             </a>
+
             <div class="hidden md:flex items-center gap-10 text-sm font-bold text-slate-500 uppercase tracking-widest">
                 <a href="/" class="hover:text-blue-600 transition">Головна</a>
                 <a href="/trips" class="hover:text-blue-600 transition">Каталог рейсів</a>
                 <a href="/about" class="hover:text-blue-600 transition">Про розробника</a>
+
+                <a href="{{ route('admin.trips.index') }}" 
+                   class="ml-4 bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-black px-5 py-2.5 rounded-full uppercase tracking-tighter shadow-lg shadow-blue-200 transition-all active:scale-95">
+                   Адмін панель CRUD
+                </a>
             </div>
         </div>
     </nav>
@@ -56,6 +63,5 @@
             </div>
         </div>
     </footer>
-
 </body>
 </html>
