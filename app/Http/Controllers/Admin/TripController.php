@@ -29,16 +29,25 @@ class TripController extends Controller
      * 3. ЗБЕРЕЖЕННЯ (Store)
      */
     public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'route' => 'required|string|max:255',
-            'status' => 'required|string',
-        ]);
+{
+    $validated = $request->validate([
+        'route' => [
+            'required',
+            'string',
+            'min:10', // Збільшимо мінімум, щоб не проходили короткі слова
+            'regex:/^[\pL\s]+(\s?[\-—]\s?)[\pL\s]+$/u', // Обов'язково назва - назва (з дефісом або тире)
+        ],
+        'status' => 'required|string',
+    ], [
+        'route.required' => 'Назва маршруту є обов’язковою.',
+        'route.min'      => 'Назва маршруту занадто коротка (мінімум 10 символів).',
+        'route.regex'    => 'Формат маршруту має бути: Місто — Місто (використовуйте тире).',
+    ]);
 
-        Trip::create($validated);
+    \App\Models\Trip::create($validated);
 
-        return redirect()->route('admin.trips.index')->with('success', 'Новий рейс успішно додано!');
-    }
+    return redirect()->route('admin.trips.index')->with('success', 'Рейс успішно додано до MyFleetDB!');
+}
 
     /**
      * 4. ДЕТАЛІ (Show)

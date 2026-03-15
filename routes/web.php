@@ -1,34 +1,47 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\MainController;
 use App\Http\Controllers\TripController;
-// Імпортуємо адмінський контролер з аліасом, щоб не було конфлікту імен
 use App\Http\Controllers\Admin\TripController as AdminTripController;
-
-/*
-|--------------------------------------------------------------------------
-| ПУБЛІЧНІ МАРШРУТИ (Для клієнтів)
-|--------------------------------------------------------------------------
-*/
+use Illuminate\Support\Facades\Route;
 
 Route::get('/', [MainController::class, 'index'])->name('home');
 Route::get('/about', [MainController::class, 'about'])->name('about');
 
-// Публічний каталог рейсів
+// Публічний каталог (тільки перегляд)
 Route::prefix('trips')->name('trips.')->group(function () {
     Route::get('/', [TripController::class, 'index'])->name('index');
     Route::get('/{trip}', [TripController::class, 'show'])->name('show'); 
 });
 
-/*
-|--------------------------------------------------------------------------
-| АДМІНІСТРАТИВНІ МАРШРУТИ (CRUD: перегляд, створення, редагування, видалення)
-|--------------------------------------------------------------------------
-*/
+// Стандартний дашборд Breeze
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::prefix('admin')->name('admin.')->group(function () {
-    // Використання resource гарантує створення маршрутів:
-    // admin.trips.index, admin.trips.edit, admin.trips.update тощо.
-    Route::resource('trips', AdminTripController::class);
+// Група маршрутів профілю та АДМІНКИ
+Route::middleware('auth')->group(function () {
+    
+    // Редагування профілю користувача
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Твоя АДМІНКА (CRUD рейсів) з ПЕРЕВІРКОЮ EMAIL
+    Route::prefix('admin')->name('admin.')->group(function () {
+        
+        // Ми обгортаємо ресурсний контролер перевіркою
+        Route::group(['middleware' => function ($request, $next) {
+            if (auth()->user()->email !== 'vanyakostritsia@gmail.com') {
+                abort(403, 'Доступ заборонено! Тільки для головного адміністратора.');
+            }
+            return $next($request);
+        }], function () {
+            Route::resource('trips', AdminTripController::class);
+        });
+        
+    });
 });
+
+require __DIR__.'/auth.php';

@@ -7,23 +7,35 @@
         <span class="bg-blue-600 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase">Admin Panel</span>
     </div>
 
-    {{-- Форма додавання --}}
+   {{-- Форма додавання --}}
     <div class="mb-10 bg-slate-900 p-8 rounded-[2.5rem] shadow-xl">
         <h2 class="text-white font-black uppercase text-xs tracking-[0.2em] mb-6">Додати новий маршрут</h2>
         <form action="{{ route('admin.trips.store') }}" method="POST" class="flex flex-col md:flex-row gap-4">
             @csrf
             <div class="flex-1">
+                {{-- Додано перевірку на помилку для рамки інпуту --}}
                 <input type="text" name="route" value="{{ old('route') }}" placeholder="НАЗВА МАРШРУТУ (НАПР. КИЇВ — ЛЬВІВ)" 
-                       class="w-full bg-slate-800 border-none rounded-2xl px-6 py-4 text-white font-bold placeholder:text-slate-500 focus:ring-2 focus:ring-blue-500 transition @error('route') ring-2 ring-red-500 @enderror" required>
-                @error('route') <p class="text-red-400 text-[10px] mt-2 font-bold uppercase">{{ $message }}</p> @enderror
+                       class="w-full bg-slate-800 border-none rounded-2xl px-6 py-4 text-white font-bold placeholder:text-slate-500 focus:ring-2 focus:ring-blue-500 transition @error('route') ring-2 ring-red-500 @enderror">
+                
+                {{-- Вивід повідомлення про помилку під інпутом --}}
+                @error('route') 
+                    <p class="text-red-400 text-[10px] mt-2 font-bold uppercase ml-2 tracking-widest">{{ $message }}</p> 
+                @enderror
             </div>
+            
             <div class="w-full md:w-64">
-                <select name="status" class="w-full bg-slate-800 border-none rounded-2xl px-6 py-4 text-white font-bold focus:ring-2 focus:ring-blue-500 transition">
-                    <option value="Заплановано">ЗАПЛАНОВАНО</option>
-                    <option value="У дорозі">У ДОРОЗІ</option>
-                    <option value="Завершено">ЗАВЕРШЕНО</option>
+                {{-- Додано перевірку на помилку для селекту --}}
+                <select name="status" class="w-full bg-slate-800 border-none rounded-2xl px-6 py-4 text-white font-bold focus:ring-2 focus:ring-blue-500 transition @error('status') ring-2 ring-red-500 @enderror">
+                    <option value="Заплановано" {{ old('status') == 'Заплановано' ? 'selected' : '' }}>ЗАПЛАНОВАНО</option>
+                    <option value="У дорозі" {{ old('status') == 'У дорозі' ? 'selected' : '' }}>У ДОРОЗІ</option>
+                    <option value="Завершено" {{ old('status') == 'Завершено' ? 'selected' : '' }}>ЗАВЕРШЕНО</option>
                 </select>
+                
+                @error('status') 
+                    <p class="text-red-400 text-[10px] mt-2 font-bold uppercase ml-2 tracking-widest">{{ $message }}</p> 
+                @enderror
             </div>
+
             <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white font-black uppercase text-xs tracking-widest px-10 py-4 rounded-2xl transition-all shadow-lg active:scale-95">
                 ДОДАТИ
             </button>
