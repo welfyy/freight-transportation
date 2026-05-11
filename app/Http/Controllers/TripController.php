@@ -1,32 +1,44 @@
-<?php
-
-namespace App\Http\Controllers;
-
-use Illuminate\Http\Request;
-use App\Models\Trip; // Імпортуємо модель, щоб брати дані з бази
-
-class TripController extends Controller
+public function index(Request $request)
 {
-    /**
-     * ПЕРЕГЛЯД КАТАЛОГУ (Для звичайних користувачів)
-     */
-    public function index()
-    {
-        // Отримуємо ВСІ реальні рейси з бази даних
-        $allTrips = Trip::all(); 
+    try {
+        $query = Trip::query();
 
-        // Передаємо їх у шаблон catalog.blade.php
-        return view('catalog', compact('allTrips'));
-    }
+        if ($request->has('category_id') && $request->category_id != null) {
+            $query->where('vehicle_id', $request->category_id);
+        }
 
-    /**
-     * ДЕТАЛЬНА СТОРІНКА РЕЙСУ
-     */
-    public function show($id)
-    {
-        // Шукаємо рейс у базі за ID. Якщо не знайдено — видасть 404
-        $trip = Trip::findOrFail($id);
+        $trips = $query->get();
 
-        return view('trip-show', compact('trip'));
+        $formattedTrips = $trips->map(function($trip, $index) {
+            // Масив маршрутів для імітації
+            $routes = [
+                1 => "Київ — Одеса",
+                2 => "Львів — Варшава",
+                3 => "Дніпро — Краків",
+                4 => "Харків — Берлін"
+            ];
+
+            // 1. Виправляємо ID: беремо trip_id, якщо він null — використовуємо індекс + 1
+            $realId = $trip->trip_id ?? ($index + 1);
+
+            // 2. Формуємо назву: перевіряємо чи є route_id у списку вище
+            // Якщо в базі route_id порожній, показуємо номер рейсу
+            $routeName = isset($routes[$trip->route_id]) 
+                ? $routes[$trip->route_id] 
+                : "Рейс #" . $realId;
+
+            return [
+                'id' => (int)$realId,
+                'title' => $routeName, 
+                'price' => $trip->price ? (float)$trip->price : 0.0,
+                'departure' => $trip->departure_date ?? 'Дата уточнюється',
+                'image' => "https://images.unsplash.com/photo-1519003722824-194d4455a60c?q=80&w=400&h=250&fit=crop",
+                'category_id' => $trip->vehicle_id ?? 1
+            ];
+        });
+
+        return response()->json($formattedTrips);
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
     }
 }

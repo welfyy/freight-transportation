@@ -6,6 +6,17 @@ use Illuminate\Database\Eloquent\Model;
 
 class Trip extends Model
 {
-    // Цей рядок дозволяє формі записувати дані в ці колонки
-    protected $fillable = ['route', 'status']; 
+    protected $table = 'trips';
+    protected $primaryKey = 'trip_id';
+    public $timestamps = false;
+
+    protected $fillable = [
+        'route_id', 
+        'vehicle_id', 
+        'departure_date', 
+        'arrival_date', 
+        'planned_departure', 
+        'planned_arrival',
+        'price' // Переконайся, що це тут
+    ];
 }
